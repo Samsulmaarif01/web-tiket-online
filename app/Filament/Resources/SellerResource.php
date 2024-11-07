@@ -6,9 +6,13 @@ use App\Filament\Resources\SellerResource\Pages;
 use App\Filament\Resources\SellerResource\RelationManagers;
 use App\Models\Seller;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -23,7 +27,21 @@ class SellerResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('name')
+                ->required()
+                ->maxLength(255),
+
+                TextInput::make('telephone')
+                ->required()
+                ->maxLength(255),
+
+                TextInput::make('location')
+                ->required()
+                ->maxLength(255),
+
+                FileUpload::make('photo')
+                ->image()
+                ->required(),
             ]);
     }
 
@@ -31,7 +49,18 @@ class SellerResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                ->searchable(),
+
+                TextColumn::make('location')
+                ->searchable(),
+
+                TextColumn::make('telephone')
+                ->searchable(),
+
+                ImageColumn::make('photo')
+                ->circular(),
+
             ])
             ->filters([
                 //
