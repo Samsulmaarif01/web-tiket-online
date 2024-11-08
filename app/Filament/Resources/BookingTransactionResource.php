@@ -15,6 +15,7 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
@@ -30,6 +31,13 @@ class BookingTransactionResource extends Resource
     protected static ?string $model = BookingTransaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) BookingTransaction::where('is_paid', false)->count();
+    }
+
+    protected static ?string $navigationGroup = 'Customer';
 
     public static function form(Form $form): Form
     {
@@ -70,7 +78,7 @@ class BookingTransactionResource extends Resource
                                 ->helperText('Harga Sudah Include Ppn 11%'),
                         ]),
 
-                        Step::make('Customer Information')
+                    Step::make('Customer Information')
                         ->schema([
                             TextInput::make('name')
                                 ->required()
@@ -89,29 +97,29 @@ class BookingTransactionResource extends Resource
                                 ->maxLength(255),
                         ]),
 
-                       Step::make('Payment Information')
-                       ->schema([
-                        ToggleButtons::make('is_paid')
-                        ->label('Apkah Sudah Membayar?')
-                        ->boolean()
-                        ->grouped()
-                        ->icons([
-                            true => 'heroicon-o-pencil',
-                            false => 'heroicon-o-clock',
-                        ])
-                        ->required(),
+                    Step::make('Payment Information')
+                        ->schema([
+                            ToggleButtons::make('is_paid')
+                                ->label('Apakah Sudah Membayar?')
+                                ->boolean()
+                                ->grouped()
+                                ->icons([
+                                    true => 'heroicon-o-pencil',
+                                    false => 'heroicon-o-clock',
+                                ])
+                                ->required(),
 
-                        FileUpload::make('proof')
-                        ->image()
-                        ->required(),
+                            FileUpload::make('proof')
+                                ->image()
+                                ->required(),
 
-                        DatePicker::make('started_at')
-                        ->required(),
+                            DatePicker::make('started_at')
+                                ->required(),
                         ]),
-                     ])
-                     ->columnSpan('full')
-                     ->columns(1)
-                     ->skippable(),
+                ])
+                ->columnSpan('full')
+                ->columns(1)
+                ->skippable(),
             ]);
     }
 
@@ -120,31 +128,47 @@ class BookingTransactionResource extends Resource
         return $table
             ->columns([
                 ImageColumn::make('ticket.thumbnail')
-                ->circular(),
+                    ->circular(),
 
                 TextColumn::make('name')
-                ->searchable(),
+                    ->searchable(),
 
                 TextColumn::make('booking_trx_id')
-                ->searchable(),
+                    ->searchable(),
 
                 IconColumn::make('is_paid')
-                ->boolean()
-                ->trueColor('success')
-                ->falseColor('danger')
-                ->trueIcon('heroicon-o-check-circle')
-                ->falseIcon('heroicon-o-x-circle')
-                ->label('Terverifikasi')
-
+                    ->boolean()
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->label('Terverifikasi'),
             ])
             ->filters([
                 SelectFilter::make('ticket_id')
-                ->label('ticket')
-                ->relationship('ticket', 'name'),
+                    ->label('ticket')
+                    ->relationship('ticket', 'name'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\Action::make('approve')
+                    ->label('Approve')
+                    ->action(function (BookingTransaction $record) {
+                        $record->is_paid = true; 
+                        $record->save();
+
+                        // trigger the custom notification
+                        Notification::make()
+                            ->title('Ticket Approved')
+                            ->success()
+                            ->body('The ticket has been successfully approved.')
+                            ->send();
+                    })
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (BookingTransaction $record) => !$record->is_paid),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
