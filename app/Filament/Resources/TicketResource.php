@@ -112,7 +112,8 @@ class TicketResource extends Resource
 
                 TextColumn::make('category.name'),
 
-                ImageColumn::make('thumbnail'),
+                ImageColumn::make('thumbnail')
+                ->circular(),
                 
                 IconColumn::make('is_popular')
                 ->boolean()
