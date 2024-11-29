@@ -1,22 +1,23 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juara Ticket</title>
-  <link href="{{asset('output.css')}}" rel="stylesheet">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Juara Ticket</title>
+        <link href="{{asset('output.css')}}" rel="stylesheet">
+        
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    </head>
 <body>
-    <div class="relative flex flex-col w-full min-h-screen max-w-[640px] mx-auto bg-white">
+    <!-- max width default 640 -->
+    <div class="relative flex flex-col w-full min-h-screen max-w-auto mx-auto bg-white"> 
         <div id="Top-Nav"  class="flex items-center justify-between w-full px-4 mt-[60px]">
             <a href="index.html">
-                <img src="{{asset('assets//images/logos/logo.svg')}}" class="flex shrink-0" alt="logo">
+                <img src="{{asset('assets/images/logos/logo.svg')}}" class="flex shrink-0" alt="logo">
             </a>
             <a href="#">
-                <img src="{{asset('assets//images/icons/heart-fill.svg')}}" class="w-12 h-12" alt="icon">
+                <img src="{{asset('assets/images/icons/heart-fill.svg')}}" class="w-12 h-12" alt="icon">
             </a>
         </div>
         <main class="flex flex-col w-full gap-5 mt-5 overflow-x-hidden">
@@ -27,7 +28,7 @@
 
                     @forelse ($popularTickets as $itemPopularTicket)
                         <div class="swiper-slide !w-fit">
-                            <a href="details.html" class="card">
+                            <a href="{{route('front.details', $itemPopularTicket->slug)}}" class="card">
                                 <div class="relative flex items-end w-[345px] h-[220px] shrink-0 rounded-[30px] bg-[#D9D9D9] overflow-hidden">
                                     <img src="{{Storage::url($itemPopularTicket->thumbnail)}}" class="absolute w-full h-full object-cover" alt="thumbnail">
                                     <div class="flex items-center justify-between w-full h-fit rounded-[17px] border border-white/40 p-[8px_10px] mx-4 mb-4 bg-[#94959966] backdrop-blur-sm">
@@ -103,7 +104,7 @@
                 <h2 class="font-bold">Now Available</h2>
                 <div class="flex flex-col gap-3">
                     @forelse($newTickets as $itemNewTicket)
-                    <a href="details.html" class="card">
+                    <a href="{{route('front.details', $itemNewTicket->slug)}}" class="card">
                         <div class="flex items-center justify-between rounded-3xl p-[6px] pr-[14px] bg-white overflow-hidden">
                             <div class="flex items-center gap-[14px]">
                                 <div class="flex w-[90px] h-[90px] shrink-0 rounded-3xl bg-[#D9D9D9] overflow-hidden">
